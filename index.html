@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>whoami — Saim Azam</title>
+<meta name="description" content="Saim Azam (iBIM0-0) — developer who ships complete, dependency-light products end to end. Go, JavaScript, Python." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #d6ecd6;
+    --panel: #0f120f;
+    --ink: #1a2a1a;
+    --term-text: #d7e8d0;
+    --green: #86efac;
+    --green-bright: #4ade80;
+    --dim: #6b8f6b;
+    --border: #b6d4b6;
+    --card: #cfe7cf;
+    --track: #bcdcbc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- themed scrollbars ---------- */
+  * { scrollbar-color: var(--green-bright) var(--track); scrollbar-width: thin; }
+  ::-webkit-scrollbar { height: 14px; width: 14px; }
+  ::-webkit-scrollbar-track { background: var(--track); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--green-bright); border-radius: 8px;
+    border: 3px solid var(--track);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #22c55e; }
+  ::-webkit-scrollbar-corner { background: var(--track); }
+
+  /* ---------- fixed top bar ---------- */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px 20px;
+    padding: 18px 30px;
+    background: linear-gradient(var(--bg), rgba(214,236,214,.85));
+  }
+  .brand { font-weight: 700; font-size: 1.2rem; }
+  .brand .prompt { color: var(--green-bright); }
+  .navlinks { display: flex; gap: 20px; flex-wrap: wrap; }
+  .navlinks a { color: var(--dim); text-decoration: none; font-size: .9rem; transition: color .15s; }
+  .navlinks a::before { content: "_"; }
+  .navlinks a:hover, .navlinks a.active { color: var(--ink); }
+  .navlinks a:hover::before, .navlinks a.active::before { color: var(--green-bright); }
+
+  /* ---------- horizontal track ---------- */
+  .track {
+    height: 100vh;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+  }
+  .panel {
+    flex: 0 0 auto;
+    height: 100vh;
+    scroll-snap-align: start;
+    padding: 96px 56px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 100vw;
+  }
+  .panel-inner { width: 100%; max-width: 860px; margin: 0 auto; }
+
+  .sec-head { font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; }
+  .sec-head .prompt { color: var(--green-bright); }
+  .sec-sub { color: var(--dim); font-size: .9rem; margin-bottom: 24px; }
+
+  .hint {
+    position: fixed; bottom: 16px; right: 24px; z-index: 50;
+    color: var(--dim); font-size: .78rem;
+  }
+  .hint b { color: var(--green-bright); }
+
+  /* ---------- hero panel ---------- */
+  .terminal {
+    background: var(--panel); border-radius: 16px;
+    padding: 34px 34px 0; position: relative; overflow: hidden;
+    box-shadow: 0 18px 40px -20px rgba(0,0,0,.45); min-height: 300px;
+  }
+  .tline { color: var(--term-text); font-size: 1.5rem; font-weight: 500; margin-bottom: 8px; position: relative; z-index: 2; }
+  .tline .arrow { color: var(--green-bright); }
+  .tline .hi { color: var(--green); }
+  .cursor { display: inline-block; width: 12px; height: 1.5rem; background: var(--green-bright);
+    vertical-align: -3px; animation: blink 1.05s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .scene { position: absolute; right: 0; bottom: 0; left: 0; height: 150px; z-index: 1; pointer-events: none; }
+  .ground { position: absolute; bottom: 34px; left: 0; right: 0; height: 2px;
+    background: repeating-linear-gradient(90deg,#3a463a 0 22px,transparent 22px 30px); opacity:.55; }
+  #dino { position: absolute; bottom: 30px; left: 46%; width: 48px; }
+  .cactus { position: absolute; bottom: 32px; }
+  .cloud { position: absolute; opacity: .35; }
+
+  .actions { display: flex; gap: 16px; margin-top: 26px; flex-wrap: wrap; }
+  .action { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 24px; text-align: center; text-decoration: none; color: var(--ink);
+    transition: transform .15s, border-color .15s, background .15s; }
+  .action:hover { transform: translateY(-3px); border-color: var(--green-bright); background: #c3e0c3; }
+  .action .title { font-weight: 700; display: block; margin-bottom: 6px; }
+  .action .key { color: var(--dim); font-size: .8rem; }
+
+  /* ---------- about ---------- */
+  .about p { max-width: 64ch; margin-bottom: 14px; }
+  .about .comment { color: var(--dim); }
+
+  /* ---------- work: horizontal row of cards ---------- */
+  .work-inner { max-width: none; }
+  .cards-row { display: flex; gap: 18px; overflow-x: auto; padding: 6px 2px 20px; }
+  .project { flex: 0 0 380px; background: var(--panel); color: var(--term-text);
+    border-radius: 12px; padding: 22px 24px; box-shadow: 0 12px 30px -22px rgba(0,0,0,.5); }
+  .project h3 { font-size: 1.05rem; color: #fff; margin-bottom: 4px; }
+  .project h3 .arrow { color: var(--green-bright); }
+  .project h3 .muted { color: var(--dim); font-weight: 400; }
+  .stack-line { color: var(--green); font-size: .8rem; margin-bottom: 12px; }
+  .project ul { list-style: none; }
+  .project li { position: relative; padding-left: 20px; margin-bottom: 7px; font-size: .86rem; color: #c9dbc4; }
+  .project li::before { content: "▹"; position: absolute; left: 0; color: var(--green-bright); }
+  .tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag { font-size: .7rem; color: var(--green); border: 1px solid #2c3a2c; border-radius: 5px; padding: 3px 8px; }
+
+  /* ---------- stack ---------- */
+  .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stack-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .stack-card h4 { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 10px; }
+  .stack-card .items { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip { font-size: .8rem; background: #bcdcbc; border-radius: 6px; padding: 4px 10px; }
+
+  /* ---------- skill icon wall ---------- */
+  .panel.scrolly { justify-content: flex-start; overflow-y: auto; }
+  .icon-wall {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    background: var(--panel); border-radius: 12px; padding: 20px 22px;
+    box-shadow: 0 12px 30px -22px rgba(0,0,0,.5); margin-bottom: 18px;
+  }
+  .icon-wall a { display: inline-flex; transition: transform .15s; }
+  .icon-wall a:hover { transform: translateY(-4px) scale(1.12); }
+  .icon-wall img { width: 34px; height: 34px; }
+
+  /* ---------- contact ---------- */
+  .contact-term { background: var(--panel); color: var(--term-text); border-radius: 12px; padding: 26px 28px; max-width: 560px; }
+  .contact-term .row { margin-bottom: 8px; font-size: .95rem; }
+  .contact-term .arrow { color: var(--green-bright); }
+  .contact-term a { color: var(--green); text-decoration: none; }
+  .contact-term a:hover { text-decoration: underline; }
+  .contact-term .key { color: var(--dim); display: inline-block; min-width: 92px; }
+  .foot { color: var(--dim); font-size: .82rem; margin-top: 20px; }
+
+  @media (max-width: 620px) {
+    .panel { padding: 90px 24px 30px; }
+    .tline { font-size: 1.15rem; }
+    .scene { display: none; }
+    .stack-grid { grid-template-columns: 1fr; }
+    .project { flex-basis: 82vw; }
+    .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand"><span class="prompt">$</span> whoami</div>
+    <nav class="navlinks">
+      <a href="#home" data-nav>home</a>
+      <a href="#about" data-nav>about</a>
+      <a href="#work" data-nav>work</a>
+      <a href="#stack" data-nav>stack</a>
+      <a href="#contact" data-nav>contact</a>
+    </nav>
+  </header>
+
+  <div class="track" id="track">
+
+    <!-- HOME -->
+    <section class="panel" id="home">
+      <div class="panel-inner">
+        <div class="terminal" id="terminal">
+          <div class="tline"><span class="arrow">&gt;</span> <span class="hi">Developer</span></div>
+          <div class="tline"><span class="arrow">&gt;</span> Problem <span class="hi">solver</span></div>
+          <div class="tline"><span class="arrow">&gt;</span> Coffee <span class="hi">addict</span></div>
+          <div class="tline"><span class="arrow">&gt;</span> <span class="hi">Minimalist</span></div>
+          <div class="tline"><span class="cursor"></span></div>
+          <div class="scene">
+            <div class="ground"></div>
+            <svg class="cloud" style="top:12px; right:140px;" width="46" height="16" viewBox="0 0 46 16" fill="none" stroke="#4a584a" stroke-width="2"><path d="M6 12h30a5 5 0 000-10c-2 0-3 1-4 2a7 7 0 00-13 2 5 5 0 00-1 6z"/></svg>
+            <svg class="cloud" style="top:6px; right:30px;" width="46" height="16" viewBox="0 0 46 16" fill="none" stroke="#4a584a" stroke-width="2"><path d="M6 12h30a5 5 0 000-10c-2 0-3 1-4 2a7 7 0 00-13 2 5 5 0 00-1 6z"/></svg>
+            <svg id="dino" viewBox="0 0 22 24" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#e8f2e4" d="M13 0h6v2h-6zM12 2h7v2h-7zM12 4h7v2h-7zM12 6h7v2h-7zM11 8h8v1h-8zM0 9h1v1H0zM11 9h8v1h-8zM0 10h1v2H0zM11 10h9v1h-9zM1 11h1v1H1zM11 11h8v1h-8zM2 12h9v3H2zM1 12h1v1H1zM11 12h5v1h-5zM2 15h11v2H2zM3 17h10v2H3zM4 19h3v2H4zM10 19h3v2h-3zM4 21h2v3H4zM10 21h2v3h-2z"/>
+              <rect x="15" y="2" width="1" height="1" fill="#0f120f"/>
+            </svg>
+            <svg class="cactus" style="right:230px;" width="14" height="30" viewBox="0 0 14 30" fill="#5f7a5f"><rect x="6" y="0" width="3" height="30"/><rect x="0" y="8" width="3" height="10"/><rect x="11" y="5" width="3" height="12"/><rect x="0" y="8" width="6" height="3"/><rect x="8" y="5" width="6" height="3"/></svg>
+            <svg class="cactus" style="right:90px;" width="18" height="40" viewBox="0 0 18 40" fill="#5f7a5f"><rect x="7" y="0" width="4" height="40"/><rect x="0" y="12" width="4" height="14"/><rect x="0" y="12" width="9" height="4"/><rect x="14" y="8" width="4" height="16"/><rect x="9" y="8" width="9" height="4"/></svg>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="action" href="#work" data-nav><span class="title">View Projects</span><span class="key">[ENTER]</span></a>
+          <a class="action" href="#about" data-nav><span class="title">About Me</span><span class="key">[CTRL+A]</span></a>
+          <a class="action" href="#contact" data-nav><span class="title">Get In Touch</span><span class="key">[CTRL+M]</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="panel" id="about">
+      <div class="panel-inner about">
+        <div class="sec-head"><span class="prompt">$</span> cat about.md</div>
+        <div class="sec-sub"># who am i, really</div>
+        <p>I'm <strong>Saim Azam</strong> — a self-driven developer who ships complete, working products end to end, not demos. Full-stack Go platforms, browser extensions, and Python automation.</p>
+        <p class="comment">// I like lean stacks: standard-library Go services, no-build frontends,<br/>// Docker deploys, and privacy-first designs that keep user data local.</p>
+        <p>Alongside code I'm working through the <strong>ACCA</strong> qualification, so I pair engineering with a solid finance foundation. I care about the details most people skip — request signing from scratch, rate limiting, graceful shutdown, and UX edges the big players miss.</p>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section class="panel" id="work">
+      <div class="panel-inner work-inner">
+        <div class="sec-head"><span class="prompt">$</span> ls ~/projects</div>
+        <div class="sec-sub"># selected work — scroll → all working end to end</div>
+        <div class="cards-row">
+          <article class="project">
+            <h3><span class="arrow">&gt;</span> Universal Studio</h3>
+            <div class="stack-line">Go · pdfcpu · pdf.js · Docker</div>
+            <ul>
+              <li>150+ browser-based tools across PDF, image, video, audio, text, QR, calculator and developer utilities.</li>
+              <li>Go API on pdfcpu: merge, split, extract, rotate, watermark, page numbers, compress, AES-256 encrypt/unlock — each request in an isolated temp dir deleted right after, so no file persists.</li>
+              <li>Visual page picker renders real PDF thumbnails client-side with pdf.js — click pages instead of blind ranges. iLovePDF & Smallpdf don't do this.</li>
+              <li>Single Docker image: API + frontend + deps, rate limiting, graceful shutdown.</li>
+            </ul>
+            <div class="tags"><span class="tag">Go</span><span class="tag">pdfcpu</span><span class="tag">pdf.js</span><span class="tag">Docker</span></div>
+          </article>
+
+          <article class="project">
+            <h3><span class="arrow">&gt;</span> HushCard</h3>
+            <div class="stack-line">Go (stdlib-only) · Vanilla JS · OAuth</div>
+            <ul>
+              <li>"Say it, don't sign it" — build a customisable card (themes, patterns, prompts, reactions), share it, receive anonymous messages.</li>
+              <li>Zero-dependency Go backend: salted iterated password hashing, HttpOnly/SameSite sessions, Google &amp; Apple OAuth, per-IP rate limiting, content filtering, security headers.</li>
+              <li>One process serves the REST API and a no-build vanilla-JS SPA (auth, dashboard, card builder, inbox, public page).</li>
+            </ul>
+            <div class="tags"><span class="tag">Go</span><span class="tag">OAuth</span><span class="tag">Vanilla JS</span><span class="tag">Zero deps</span></div>
+          </article>
+
+          <article class="project">
+            <h3><span class="arrow">&gt;</span> AI Chat Vault</h3>
+            <div class="stack-line">JavaScript · Manifest V3 · IndexedDB</div>
+            <ul>
+              <li>Cross-browser extension that auto-captures and locally indexes Claude &amp; ChatGPT chats, with full-text search in a popup.</li>
+              <li>Content scripts for live capture, local-first IndexedDB on the free tier, planned Supabase sync + Stripe billing.</li>
+              <li>Verified working end to end on both Claude and ChatGPT.</li>
+            </ul>
+            <div class="tags"><span class="tag">Manifest V3</span><span class="tag">IndexedDB</span><span class="tag">Search</span></div>
+          </article>
+
+          <article class="project">
+            <h3><span class="arrow">&gt;</span> Missed-Call Text-Back</h3>
+            <div class="stack-line">Go (stdlib-only) · Twilio · Webhooks</div>
+            <ul>
+              <li>Auto-replies to missed business calls over SMS and forwards the lead to the owner in real time.</li>
+              <li>Twilio webhook signature validation (HMAC-SHA1) written from scratch — no external deps.</li>
+              <li>Per-client env config (one codebase, many clients) with a durable JSON-lines event log.</li>
+            </ul>
+            <div class="tags"><span class="tag">Go</span><span class="tag">Twilio</span><span class="tag">HMAC</span></div>
+          </article>
+
+          <article class="project">
+            <h3><span class="arrow">&gt;</span> Client-Finding Automation</h3>
+            <div class="stack-line">Python · Google Places · openpyxl</div>
+            <ul>
+              <li>Give it an industry + country; finds ~100 businesses, scrapes each site for contacts and decision-makers.</li>
+              <li>Compiles everything into a styled Excel report.</li>
+              <li>Pipeline: API search → scraping → cleaning → formatted spreadsheet.</li>
+            </ul>
+            <div class="tags"><span class="tag">Python</span><span class="tag">Places API</span><span class="tag">openpyxl</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- STACK -->
+    <section class="panel scrolly" id="stack">
+      <div class="panel-inner">
+        <div class="sec-head"><span class="prompt">$</span> cat stack.txt</div>
+        <div class="sec-sub"># tools i reach for</div>
+
+        <div class="icon-wall">
+          <a href="https://go.dev/doc/" target="_blank" rel="noreferrer" title="Go"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/go-colored.svg" alt="Go" /></a>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer" title="JavaScript"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/javascript-colored.svg" alt="JavaScript" /></a>
+          <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer" title="TypeScript"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/typescript-colored.svg" alt="TypeScript" /></a>
+          <a href="https://www.python.org/" target="_blank" rel="noreferrer" title="Python"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/python-colored.svg" alt="Python" /></a>
+          <a href="https://www.php.net/" target="_blank" rel="noreferrer" title="PHP"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/php-colored.svg" alt="PHP" /></a>
+          <a href="https://lua.org/" target="_blank" rel="noreferrer" title="Lua"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/lua-colored.svg" alt="Lua" /></a>
+          <a href="https://developer.mozilla.org/en-US/docs/Glossary/HTML5" target="_blank" rel="noreferrer" title="HTML5"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/html5-colored.svg" alt="HTML5" /></a>
+          <a href="https://www.w3.org/TR/CSS/#css" target="_blank" rel="noreferrer" title="CSS3"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/css3-colored.svg" alt="CSS3" /></a>
+          <a href="https://reactjs.org/" target="_blank" rel="noreferrer" title="React"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/react-colored.svg" alt="React" /></a>
+          <a href="https://nextjs.org/docs" target="_blank" rel="noreferrer" title="Next.js"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/nextjs-colored-dark.svg" alt="Next.js" /></a>
+          <a href="https://vuejs.org/" target="_blank" rel="noreferrer" title="Vue"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/vuejs-colored.svg" alt="Vue" /></a>
+          <a href="https://svelte.dev/" target="_blank" rel="noreferrer" title="Svelte"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/svelte-colored.svg" alt="Svelte" /></a>
+          <a href="https://www.solidjs.com/" target="_blank" rel="noreferrer" title="SolidJS"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/solidjs-colored-dark.svg" alt="SolidJS" /></a>
+          <a href="https://emberjs.com/" target="_blank" rel="noreferrer" title="Ember.js"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/emberjs-colored.svg" alt="Ember.js" /></a>
+          <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer" title="TailwindCSS"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/tailwindcss-colored.svg" alt="TailwindCSS" /></a>
+          <a href="https://ui.shadcn.com/" target="_blank" rel="noreferrer" title="Shadcn/ui"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/shadcnui-colored-dark.svg" alt="Shadcn/ui" /></a>
+          <a href="https://nodejs.org/en/" target="_blank" rel="noreferrer" title="Node.js"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/nodejs-colored.svg" alt="Node.js" /></a>
+          <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noreferrer" title="FastAPI"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/fastapi-colored.svg" alt="FastAPI" /></a>
+          <a href="https://flask.palletsprojects.com/" target="_blank" rel="noreferrer" title="Flask"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/flask-colored-dark.svg" alt="Flask" /></a>
+          <a href="https://www.mysql.com/" target="_blank" rel="noreferrer" title="MySQL"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/mysql-colored.svg" alt="MySQL" /></a>
+          <a href="https://www.postgresql.org/" target="_blank" rel="noreferrer" title="PostgreSQL"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/postgresql-colored.svg" alt="PostgreSQL" /></a>
+          <a href="https://firebase.google.com/" target="_blank" rel="noreferrer" title="Firebase"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/firebase-colored.svg" alt="Firebase" /></a>
+          <a href="https://supabase.io/" target="_blank" rel="noreferrer" title="Supabase"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/supabase-colored.svg" alt="Supabase" /></a>
+          <a href="https://www.docker.com/" target="_blank" rel="noreferrer" title="Docker"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/docker-colored.svg" alt="Docker" /></a>
+          <a href="https://cloud.google.com/" target="_blank" rel="noreferrer" title="Google Cloud"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/googlecloud-colored.svg" alt="Google Cloud" /></a>
+          <a href="https://render.com/" target="_blank" rel="noreferrer" title="Render"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/render-colored.svg" alt="Render" /></a>
+          <a href="https://www.heroku.com/" target="_blank" rel="noreferrer" title="Heroku"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/heroku-colored.svg" alt="Heroku" /></a>
+          <a href="https://resend.com/" target="_blank" rel="noreferrer" title="Resend"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/resend-colored-dark.svg" alt="Resend" /></a>
+          <a href="https://huggingface.co/" target="_blank" rel="noreferrer" title="Hugging Face"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/huggingface-colored-dark.svg" alt="Hugging Face" /></a>
+          <a href="https://web3js.readthedocs.io/" target="_blank" rel="noreferrer" title="Web3.js"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/web3js-colored.svg" alt="Web3.js" /></a>
+          <a href="https://www.linux.org" target="_blank" rel="noreferrer" title="Linux"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/linux-colored.svg" alt="Linux" /></a>
+          <a href="https://ubuntu.com/" target="_blank" rel="noreferrer" title="Ubuntu"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/ubuntu-colored.svg" alt="Ubuntu" /></a>
+          <a href="https://git-scm.com/" target="_blank" rel="noreferrer" title="Git"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/git-colored.svg" alt="Git" /></a>
+          <a href="https://code.visualstudio.com/" target="_blank" rel="noreferrer" title="VS Code"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/visualstudiocode-colored.svg" alt="VS Code" /></a>
+          <a href="https://www.figma.com/" target="_blank" rel="noreferrer" title="Figma"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/figma-colored.svg" alt="Figma" /></a>
+          <a href="https://www.adobe.com/products/photoshop.html" target="_blank" rel="noreferrer" title="Photoshop"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/photoshop-colored-dark.svg" alt="Photoshop" /></a>
+          <a href="https://www.blender.org/" target="_blank" rel="noreferrer" title="Blender"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/blender-colored.svg" alt="Blender" /></a>
+          <a href="https://wordpress.com" target="_blank" rel="noreferrer" title="WordPress"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/wordpress-colored.svg" alt="WordPress" /></a>
+          <a href="https://wix.com" target="_blank" rel="noreferrer" title="Wix"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/wix-colored.svg" alt="Wix" /></a>
+          <a href="https://webflow.com/" target="_blank" rel="noreferrer" title="Webflow"><img loading="lazy" src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/webflow-colored.svg" alt="Webflow" /></a>
+        </div>
+
+        <div class="stack-grid">
+          <div class="stack-card"><h4>Languages</h4><div class="items"><span class="chip">Go</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">Python</span><span class="chip">PHP</span><span class="chip">Lua</span><span class="chip">HTML/CSS</span></div></div>
+          <div class="stack-card"><h4>Frontend</h4><div class="items"><span class="chip">React</span><span class="chip">Next.js</span><span class="chip">Vue</span><span class="chip">Svelte</span><span class="chip">SolidJS</span><span class="chip">Ember.js</span><span class="chip">Tailwind</span><span class="chip">Shadcn/ui</span></div></div>
+          <div class="stack-card"><h4>Backend</h4><div class="items"><span class="chip">Node.js</span><span class="chip">FastAPI</span><span class="chip">Flask</span><span class="chip">net/http</span><span class="chip">REST APIs</span></div></div>
+          <div class="stack-card"><h4>Databases</h4><div class="items"><span class="chip">MySQL</span><span class="chip">PostgreSQL</span><span class="chip">Firebase</span><span class="chip">Supabase</span></div></div>
+          <div class="stack-card"><h4>Cloud &amp; Deploy</h4><div class="items"><span class="chip">Docker</span><span class="chip">Google Cloud</span><span class="chip">Render</span><span class="chip">Heroku</span><span class="chip">Resend</span></div></div>
+          <div class="stack-card"><h4>Tools &amp; OS</h4><div class="items"><span class="chip">Git</span><span class="chip">VS Code</span><span class="chip">Linux</span><span class="chip">Ubuntu</span></div></div>
+          <div class="stack-card"><h4>Design</h4><div class="items"><span class="chip">Figma</span><span class="chip">Photoshop</span><span class="chip">Blender</span></div></div>
+          <div class="stack-card"><h4>Web &amp; Other</h4><div class="items"><span class="chip">Web3.js</span><span class="chip">Hugging Face</span><span class="chip">WordPress</span><span class="chip">Wix</span><span class="chip">Webflow</span></div></div>
+          <div class="stack-card"><h4>Principles</h4><div class="items"><span class="chip">Zero-dependency</span><span class="chip">Local-first</span><span class="chip">Privacy-first</span><span class="chip">No-build</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="panel" id="contact">
+      <div class="panel-inner">
+        <div class="sec-head"><span class="prompt">$</span> ./contact.sh</div>
+        <div class="sec-sub"># let's build something</div>
+        <div class="contact-term">
+          <div class="row"><span class="arrow">&gt;</span> <span class="key">email</span> <a href="mailto:ibimo0dev@gmail.com">ibimo0dev@gmail.com</a></div>
+          <div class="row"><span class="arrow">&gt;</span> <span class="key">github</span> <a href="https://github.com/iBIM0-0" target="_blank" rel="noopener">github.com/iBIM0-0</a></div>
+          <div class="row"><span class="arrow">&gt;</span> <span class="key">status</span> open to work &amp; freelance</div>
+          <div class="row"><span class="arrow">&gt;</span> <span class="key">edu</span> ACCA (in progress)</div>
+          <div class="row" style="margin-top:12px"><span class="arrow">&gt;</span> <span class="cursor" style="height:1rem;vertical-align:-2px"></span></div>
+        </div>
+        <div class="foot">© 2026 whoami.dev — built by Saim Azam (iBIM0-0)</div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="hint">scroll <b>→</b> · or use <b>← →</b> keys</div>
+
+<script>
+  var track = document.getElementById('track');
+
+  // Wheel: convert vertical scroll to horizontal
+  track.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      track.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  // Nav + action links → smooth horizontal scroll to panel
+  function goTo(id) {
+    var el = document.getElementById(id);
+    if (el) track.scrollTo({ left: el.offsetLeft, behavior: 'smooth' });
+  }
+  document.querySelectorAll('[data-nav]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      goTo(a.getAttribute('href').slice(1));
+    });
+  });
+
+  // Arrow keys + shortcuts
+  var order = ['home', 'about', 'work', 'stack', 'contact'];
+  function current() {
+    var i = Math.round(track.scrollLeft / window.innerWidth);
+    return Math.max(0, Math.min(order.length - 1, i));
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { goTo(order[Math.min(order.length - 1, current() + 1)]); }
+    else if (e.key === 'ArrowLeft') { goTo(order[Math.max(0, current() - 1)]); }
+    else if (e.key === 'Enter' && e.target === document.body) { goTo('work'); }
+    else if (e.ctrlKey && (e.key === 'a' || e.key === 'A')) { e.preventDefault(); goTo('about'); }
+    else if (e.ctrlKey && (e.key === 'm' || e.key === 'M')) { e.preventDefault(); goTo('contact'); }
+  });
+
+  // Active nav highlight
+  var links = document.querySelectorAll('.navlinks a');
+  track.addEventListener('scroll', function () {
+    var id = order[current()];
+    links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
+  });
+
+  // Dino hop on terminal click
+  var dino = document.getElementById('dino');
+  var terminal = document.getElementById('terminal');
+  if (dino && terminal) {
+    terminal.addEventListener('click', function () {
+      dino.animate([{transform:'translateY(0)'},{transform:'translateY(-34px)'},{transform:'translateY(0)'}],
+        {duration:420, easing:'ease-out'});
+    });
+  }
+</script>
+</body>
+</html>
