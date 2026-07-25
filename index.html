@@ -78,19 +78,19 @@
     max-width: 100vw;
     height: 100vh;
     scroll-snap-align: start;
-    padding: 96px 56px 40px;
+    padding: clamp(66px, 13vh, 96px) clamp(20px, 4vw, 56px) clamp(16px, 4vh, 40px);
     display: flex;
     flex-direction: column;
     justify-content: safe center;
     overflow: hidden;
   }
-  /* work flows within the main side-scroll — no inner scrollbar */
-  #work { flex: 0 0 auto; width: auto; min-width: 100vw; max-width: none; }
+  /* work + stack flow within the main side-scroll — no inner scrollbars */
+  #work, #stack { flex: 0 0 auto; width: auto; min-width: 100vw; max-width: none; }
   .panel-inner { width: 100%; max-width: 860px; margin: 0 auto; min-width: 0; }
 
-  .sec-head { font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; }
+  .sec-head { font-size: clamp(1.05rem, 2.6vh, 1.35rem); font-weight: 700; margin-bottom: 2px; }
   .sec-head .prompt { color: var(--green-bright); }
-  .sec-sub { color: var(--dim); font-size: .9rem; margin-bottom: 24px; }
+  .sec-sub { color: var(--dim); font-size: clamp(.75rem, 1.6vh, .9rem); margin-bottom: clamp(10px, 2.6vh, 24px); }
 
   .hint {
     position: fixed; bottom: 16px; right: 24px; z-index: 50;
@@ -185,26 +185,33 @@
   .about .comment { color: var(--dim); }
 
   /* ---------- work: horizontal row of cards ---------- */
-  .work-inner { max-width: none; }
+  .work-inner, #stack .panel-inner { max-width: none; }
+  @media (max-height: 640px) { .stack-grid { grid-template-rows: repeat(2, auto); } }
   .cards-row { display: flex; flex-wrap: nowrap; gap: 18px; padding: 6px 2px 20px; }
-  .project { flex: 0 0 380px; background: var(--panel); color: var(--term-text);
-    border-radius: 12px; padding: 22px 24px; box-shadow: 0 12px 30px -22px rgba(0,0,0,.5); }
-  .project h3 { font-size: 1.05rem; color: #fff; margin-bottom: 4px; }
+  .project { flex: 0 0 auto; width: clamp(230px, 78vw, 360px); background: var(--panel); color: var(--term-text);
+    border-radius: 12px; padding: clamp(13px, 2.6vh, 24px) clamp(15px, 3vw, 24px);
+    box-shadow: 0 12px 30px -22px rgba(0,0,0,.5); }
+  .project h3 { font-size: clamp(.88rem, 1.9vh, 1.05rem); color: #fff; margin-bottom: 3px; }
   .project h3 .arrow { color: var(--green-bright); }
   .project h3 .muted { color: var(--dim); font-weight: 400; }
-  .stack-line { color: var(--green); font-size: .8rem; margin-bottom: 12px; }
+  .stack-line { color: var(--green); font-size: clamp(.68rem, 1.4vh, .8rem); margin-bottom: clamp(6px, 1.3vh, 12px); }
   .project ul { list-style: none; }
-  .project li { position: relative; padding-left: 20px; margin-bottom: 7px; font-size: .86rem; color: #c9dbc4; }
+  .project li { position: relative; padding-left: 18px; margin-bottom: clamp(3px, .8vh, 7px);
+    font-size: clamp(.7rem, 1.55vh, .86rem); line-height: 1.5; color: #c9dbc4; }
   .project li::before { content: "▹"; position: absolute; left: 0; color: var(--green-bright); }
-  .tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 7px; }
-  .tag { font-size: .7rem; color: var(--green); border: 1px solid #2c3a2c; border-radius: 5px; padding: 3px 8px; }
+  .tags { margin-top: clamp(6px, 1.3vh, 12px); display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: clamp(.62rem, 1.2vh, .7rem); color: var(--green); border: 1px solid #2c3a2c; border-radius: 5px; padding: 2px 7px; }
 
   /* ---------- stack ---------- */
-  .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .stack-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
-  .stack-card h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 8px; }
-  .stack-card .items { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip { font-size: .8rem; background: #bcdcbc; border-radius: 6px; padding: 4px 10px; }
+  .stack-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(3, auto);
+    grid-auto-columns: minmax(170px, 230px); gap: clamp(7px, 1.5vh, 12px); align-content: start; }
+  .stack-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: clamp(8px, 1.6vh, 12px) clamp(11px, 1.4vw, 16px); }
+  .stack-card h4 { font-size: clamp(.6rem, 1.3vh, .72rem); text-transform: uppercase; letter-spacing: 1px;
+    color: var(--dim); margin-bottom: clamp(4px, 1vh, 8px); }
+  .stack-card .items { display: flex; flex-wrap: wrap; gap: clamp(4px, .9vh, 7px); }
+  .chip { font-size: clamp(.66rem, 1.4vh, .8rem); background: #bcdcbc; border-radius: 6px;
+    padding: clamp(2px, .5vh, 4px) clamp(6px, .9vw, 10px); }
 
   /* ---------- skill icon wall ---------- */
   .panel.scrolly { justify-content: flex-start; overflow-y: auto; }
@@ -423,20 +430,28 @@
     });
     return best;
   }
+  // Arrow keys scroll by one screen (snappy — avoids long jumps across the wide work panel)
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight') { goTo(order[Math.min(order.length - 1, current() + 1)]); }
-    else if (e.key === 'ArrowLeft') { goTo(order[Math.max(0, current() - 1)]); }
+    var step = Math.round(window.innerWidth * 0.9);
+    if (e.key === 'ArrowRight') { e.preventDefault(); track.scrollBy({ left: step, behavior: 'smooth' }); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); track.scrollBy({ left: -step, behavior: 'smooth' }); }
     else if (e.key === 'Enter' && e.target === document.body) { goTo('work'); }
     else if (e.ctrlKey && (e.key === 'a' || e.key === 'A')) { e.preventDefault(); goTo('about'); }
     else if (e.ctrlKey && (e.key === 'm' || e.key === 'M')) { e.preventDefault(); goTo('contact'); }
   });
 
-  // Active nav highlight
+  // Active nav highlight (throttled to one update per frame)
   var links = document.querySelectorAll('.navlinks a');
+  var ticking = false;
   track.addEventListener('scroll', function () {
-    var id = order[current()];
-    links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
-  });
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var id = order[current()];
+      links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
+      ticking = false;
+    });
+  }, { passive: true });
 
   // Streaming terminal feed — commands, output, code, binaries (loops forever)
   (function () {
