@@ -81,8 +81,9 @@
     padding: 96px 56px 40px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
+    justify-content: safe center;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   .panel-inner { width: 100%; max-width: 860px; margin: 0 auto; min-width: 0; }
 
@@ -127,8 +128,10 @@
   .term-head { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 700; color: #fff; margin-bottom: 16px; }
   .term-head .hi { color: var(--green-bright); }
   .term-stream { font-size: clamp(.8rem, 2.4vw, 1rem); line-height: 1.85; height: clamp(190px, 30vh, 300px);
-    overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
-  .term-stream .row { display: block; }
+    overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 42px); mask-image: linear-gradient(to bottom, transparent 0, #000 42px); }
+  .term-stream .row { display: block; flex: 0 0 auto; }
   .l-cmd { color: var(--term-text); } .l-cmd .p { color: var(--green-bright); margin-right: 8px; }
   .l-out { color: var(--dim); }
   .l-sk  { color: var(--green); }
@@ -168,13 +171,13 @@
   @keyframes solveBad { 0%,62% { opacity: 1; } 66%,100% { opacity: 0; } }
   @keyframes solveOk  { 0%,62% { opacity: 0; } 66%,100% { opacity: 1; } }
 
-  .actions { display: flex; gap: 16px; margin-top: 26px; flex-wrap: wrap; }
-  .action { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    padding: 18px 24px; text-align: center; text-decoration: none; color: var(--ink);
+  .actions { display: flex; gap: clamp(10px, 2vw, 16px); margin-top: 24px; flex-wrap: wrap; width: 100%; }
+  .action { flex: 1 1 150px; min-width: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: clamp(14px, 2.4vw, 18px) clamp(12px, 2vw, 24px); text-align: center; text-decoration: none; color: var(--ink);
     transition: transform .15s, border-color .15s, background .15s; }
   .action:hover { transform: translateY(-3px); border-color: var(--green-bright); background: #c3e0c3; }
-  .action .title { font-weight: 700; display: block; margin-bottom: 6px; }
-  .action .key { color: var(--dim); font-size: .8rem; }
+  .action .title { font-weight: 700; display: block; margin-bottom: 6px; font-size: clamp(.9rem, 2.4vw, 1rem); white-space: nowrap; }
+  .action .key { color: var(--dim); font-size: clamp(.72rem, 1.8vw, .8rem); }
 
   /* ---------- about ---------- */
   .about p { max-width: 64ch; margin-bottom: 14px; }
@@ -366,7 +369,7 @@
         <div class="sec-head"><span class="prompt">$</span> ./contact.sh</div>
         <div class="sec-sub"># let's build something</div>
         <div class="contact-term">
-          <div class="row"><span class="arrow">&gt;</span> <span class="key">email</span> <a id="mailLink" href="mailto:ibimo0dev@gmail.com?subject=Hi%20Saim%20%E2%80%94%20from%20your%20portfolio">ibimo0dev@gmail.com</a></div>
+          <div class="row"><span class="arrow">&gt;</span> <span class="key">email</span> <a id="mailLink" href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=ibimo0dev@gmail.com&su=Hi%20Saim%20%E2%80%94%20from%20your%20portfolio&body=Hi%20Saim%2C%0A%0AI%20found%20you%20through%20your%20portfolio%20and%20wanted%20to%20reach%20out%20about%20" target="_blank" rel="noopener">ibimo0dev@gmail.com</a></div>
           <div class="row"><span class="arrow">&gt;</span> <span class="key">x</span> <a href="https://x.com/ibimo_0" target="_blank" rel="noopener">@ibimo_0</a></div>
           <div class="row"><span class="arrow">&gt;</span> <span class="key">whatsapp</span> <a href="https://wa.me/923397556187" target="_blank" rel="noopener">+92 339 7556187</a></div>
           <div class="row"><span class="arrow">&gt;</span> <span class="key">discord</span> <span style="color:var(--term-text)">Bimo</span> <span style="color:var(--dim)">(i_samuu)</span></div>
