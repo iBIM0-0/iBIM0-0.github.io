@@ -359,9 +359,17 @@
 
   // Arrow keys + shortcuts
   var order = ['home', 'about', 'work', 'stack', 'contact'];
+  var sections = order.map(function (id) { return document.getElementById(id); });
+  // Pick the panel whose left edge is nearest the current scroll position
+  // (panels aren't all one screen wide — the work panel is wider).
   function current() {
-    var i = Math.round(track.scrollLeft / window.innerWidth);
-    return Math.max(0, Math.min(order.length - 1, i));
+    var x = track.scrollLeft;
+    var best = 0, bestDist = Infinity;
+    sections.forEach(function (el, i) {
+      var d = Math.abs(el.offsetLeft - x);
+      if (d < bestDist) { bestDist = d; best = i; }
+    });
+    return best;
   }
   document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight') { goTo(order[Math.min(order.length - 1, current() + 1)]); }
