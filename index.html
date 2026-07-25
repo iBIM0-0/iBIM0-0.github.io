@@ -72,16 +72,19 @@
     scroll-behavior: smooth;
   }
   .panel {
-    flex: 0 0 auto;
+    flex: 0 0 100vw;
+    width: 100vw;
+    min-width: 100vw;
+    max-width: 100vw;
     height: 100vh;
     scroll-snap-align: start;
     padding: 96px 56px 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-width: 100vw;
+    overflow: hidden;
   }
-  .panel-inner { width: 100%; max-width: 860px; margin: 0 auto; }
+  .panel-inner { width: 100%; max-width: 860px; margin: 0 auto; min-width: 0; }
 
   .sec-head { font-size: 1.35rem; font-weight: 700; margin-bottom: 2px; }
   .sec-head .prompt { color: var(--green-bright); }
@@ -96,7 +99,7 @@
   /* ---------- hero panel ---------- */
   .terminal {
     background: var(--panel); border-radius: 16px;
-    padding: 0; position: relative; overflow: hidden;
+    padding: 36px 36px 0; position: relative; overflow: hidden;
     box-shadow: 0 18px 40px -20px rgba(0,0,0,.45); min-height: 320px;
   }
   .term-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px;
@@ -111,7 +114,7 @@
   .term-body .out.dim { color: var(--dim); }
   .caret { display: inline-block; width: 10px; height: 1.15rem; background: var(--green-bright);
     vertical-align: -3px; margin-left: 2px; animation: blink 1.05s steps(1) infinite; }
-  .tline { color: var(--term-text); font-size: 1.2rem; font-weight: 500; margin-bottom: 6px; position: relative; z-index: 2; }
+  .tline { color: var(--term-text); font-size: 1.5rem; font-weight: 500; margin-bottom: 8px; position: relative; z-index: 2; }
   .tline .arrow { color: var(--green-bright); }
   .tline .hi { color: var(--green); }
   .tline.tsmall { font-size: .85rem; color: var(--dim); margin-bottom: 6px; }
@@ -120,7 +123,18 @@
   .cursor { display: inline-block; width: 12px; height: 1.5rem; background: var(--green-bright);
     vertical-align: -3px; animation: blink 1.05s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .scene { position: absolute; right: 0; bottom: 0; left: 0; top: 0; z-index: 1; pointer-events: none; }
+  /* hero header + streaming feed */
+  .term-head { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .term-head .hi { color: var(--green-bright); }
+  .term-stream { font-size: clamp(.8rem, 2.4vw, 1rem); line-height: 1.85; height: clamp(190px, 30vh, 300px);
+    overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+  .term-stream .row { display: block; }
+  .l-cmd { color: var(--term-text); } .l-cmd .p { color: var(--green-bright); margin-right: 8px; }
+  .l-out { color: var(--dim); }
+  .l-sk  { color: var(--green); }
+  .l-ok  { color: var(--green-bright); }
+  .l-bin { color: #3f5a3f; letter-spacing: 1px; }
+  .l-code{ color: #38bec9; }
   .ground { position: absolute; bottom: 34px; left: 0; right: 0; height: 2px;
     background: repeating-linear-gradient(90deg,#3a463a 0 22px,transparent 22px 30px); opacity:.55; }
   .bimo-wrap { position: absolute; bottom: 28px; left: 42%; display: flex; flex-direction: column; align-items: center; animation: bob 1.3s ease-in-out infinite; }
@@ -239,11 +253,8 @@
     <section class="panel" id="home">
       <div class="panel-inner">
         <div class="terminal" id="terminal">
-          <div class="term-bar">
-            <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
-            <span class="term-title">bimo@dev: ~</span>
-          </div>
-          <div class="term-body" id="termBody"></div>
+          <div class="term-head">Hi, I'm <span class="hi">Bimo</span><span class="cursor"></span></div>
+          <div class="term-stream" id="stream" aria-hidden="true"></div>
         </div>
         <div class="actions">
           <a class="action" href="#work" data-nav><span class="title">View Projects</span><span class="key">[ENTER]</span></a>
@@ -423,58 +434,65 @@
     links.forEach(function (l) { l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
   });
 
-  // Self-typing terminal
+  // Streaming terminal feed — commands, output, code, binaries (loops forever)
   (function () {
-    var body = document.getElementById('termBody');
-    if (!body) return;
-    var script = [
-      { cmd: 'whoami' },
-      { out: 'Saim Azam  —  full-stack developer' },
-      { cmd: 'cat stack.txt' },
-      { out: 'Go · JavaScript · Python · Docker · Postgres', dim: true },
-      { cmd: 'echo $STATUS' },
-      { out: '● open to work & freelance' },
-      { cmd: '' }
+    var stream = document.getElementById('stream');
+    if (!stream) return;
+    var feed = [
+      ['cmd', 'whoami'],
+      ['out', 'Saim Azam — full-stack developer (aka Bimo)'],
+      ['bin', '01001000 01101001 00100001'],
+      ['cmd', 'cat about.md'],
+      ['out', '# ships complete, working products end-to-end'],
+      ['out', '# lean stacks · Go stdlib · no-build frontends · privacy-first'],
+      ['cmd', 'ls ~/skills'],
+      ['sk',  'Go  JavaScript  TypeScript  Python  HTML/CSS'],
+      ['sk',  'React  Next.js  Tailwind  Node  FastAPI  Postgres  Docker'],
+      ['code','func main() { http.ListenAndServe(":8080", router) }'],
+      ['cmd', 'git commit -m "ship it"'],
+      ['ok',  '[ok] 4 files changed, 210 insertions(+)'],
+      ['bin', '0110001001101001011011010110111101'],
+      ['cmd', 'docker compose up -d'],
+      ['out', '✔ api healthy · 200 OK · 0.42s'],
+      ['code','const bimo = () => build(cool, things)'],
+      ['cmd', 'echo $STATUS'],
+      ['ok',  '● open to work & freelance'],
+      ['bin', '01000010 01101001 01101101 01101111'],
     ];
+    var MAX = 13, i = 0;
     var caret = document.createElement('span');
-    caret.className = 'caret';
-    var i = 0;
+    caret.className = 'cursor';
 
-    function typeCmd(text, done) {
-      var line = document.createElement('div');
-      line.className = 'cmd';
-      var p = document.createElement('span'); p.className = 'p'; p.textContent = '$';
-      var span = document.createElement('span');
-      line.appendChild(p); line.appendChild(span); line.appendChild(caret);
-      body.appendChild(line);
+    function typeCmd(row, text, done) {
+      var t = document.createTextNode('');
+      row.appendChild(t); row.appendChild(caret);
       var n = 0;
       (function tick() {
-        if (n <= text.length) {
-          span.textContent = text.slice(0, n);
-          n++;
-          setTimeout(tick, 55 + Math.random() * 45);
-        } else { setTimeout(done, 260); }
+        if (n <= text.length) { t.textContent = text.slice(0, n); n++; setTimeout(tick, 45 + Math.random() * 40); }
+        else { done(); }
       })();
     }
 
-    function printOut(item, done) {
-      var line = document.createElement('div');
-      line.className = 'out' + (item.dim ? ' dim' : '');
-      line.textContent = item.out;
-      body.appendChild(line);
-      setTimeout(done, 380);
-    }
-
-    function step() {
-      if (i >= script.length) { return; }
-      var item = script[i++];
-      if (item.cmd !== undefined) {
-        typeCmd(item.cmd, step);
+    function push() {
+      var item = feed[i % feed.length]; i++;
+      var row = document.createElement('span');
+      row.className = 'row l-' + item[0];
+      stream.appendChild(row);
+      while (stream.children.length > MAX) stream.removeChild(stream.firstChild);
+      var after = function () {
+        if (caret.parentNode) caret.parentNode.removeChild(caret);
+        setTimeout(push, item[0] === 'cmd' ? 520 : 340 + Math.random() * 240);
+      };
+      if (item[0] === 'cmd') {
+        var p = document.createElement('span'); p.className = 'p'; p.textContent = '$';
+        row.appendChild(p);
+        typeCmd(row, item[1], after);
       } else {
-        printOut(item, step);
+        row.textContent = item[1];
+        after();
       }
     }
-    step();
+    push();
   })();
 </script>
 </body>
